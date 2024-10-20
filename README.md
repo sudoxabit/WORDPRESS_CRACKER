@@ -7,3 +7,18 @@
 𝔹𝕌𝕋 𝔻𝕆ℕ𝕋 𝕎𝕆ℝℝ𝕐 𝔽𝔼𝔼𝕃 𝔽ℝ𝔼𝔼 𝕋𝕆 𝔼𝔻𝕀𝕋 
 
 𝔾𝕀𝕍𝔼 ℂℝ𝔼𝔻𝕀𝕋𝕊 
+
+USAGE : 
+1 : clone repo 
+2 : run setup and then main script 
+
+FOR LOGIN CHECKER : 
+CREATE A wordpress website list in this format : https://example.com/wp-login.php#username@pass      
+for finding default passwords user #admin@pass add this at the end of everysite
+
+FOR USING CRACKER : 
+
+SAME CREATE A  LIST OF WEBSITES in this format https://example.com/wp-login.php and nothing else and save them 
+then enter a wordlist u want thank you 
+
+ENJOY 
